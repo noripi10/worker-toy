@@ -25,8 +25,19 @@ export interface Env {
 	// MY_QUEUE: Queue;
 }
 
+// addEventListener('fetch', (event) => {
+// 	event.respondWith(new Response('hello world!!!'));
+// });
+
+const triggerHandler = async (controller: ScheduledController, env: Env) => {
+	console.info(controller.cron, controller.scheduledTime, env);
+};
+
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		return new Response('Hello World!');
+	},
+	async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
+		ctx.waitUntil(triggerHandler(controller, env));
 	},
 };
