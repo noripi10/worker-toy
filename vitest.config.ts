@@ -1,9 +1,11 @@
-/// <reference types="vitest" />
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config';
 
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
+export default defineWorkersConfig({
 	test: {
-		globals: true,
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: './wrangler.toml' },
+			},
+		},
 	},
 });

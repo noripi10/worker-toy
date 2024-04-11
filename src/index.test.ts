@@ -1,21 +1,10 @@
-import { UnstableDevWorker, unstable_dev } from 'wrangler';
-import { describe, test } from 'vitest';
+import { SELF } from 'cloudflare:test';
+import { expect, describe, test } from 'vitest';
+import '.';
 
 describe('Worker', () => {
-	let worker: UnstableDevWorker;
-
-	beforeAll(async () => {
-		worker = await unstable_dev('src/index.ts', {
-			experimental: { disableExperimentalWarning: true },
-		});
-	});
-
-	afterAll(async () => {
-		await worker.stop();
-	});
-
 	test('should return Hello World', async () => {
-		const response = await worker.fetch();
+		const response = await SELF.fetch('http://example.com/');
 
 		if (response) {
 			expect(response.status).toBe(200);
@@ -25,7 +14,7 @@ describe('Worker', () => {
 	});
 
 	test('should return Not Found', async () => {
-		const response = await worker.fetch('/404');
+		const response = await SELF.fetch('http://example.com/404');
 
 		if (response) {
 			expect(response.status).toBe(404);
@@ -35,7 +24,7 @@ describe('Worker', () => {
 	});
 
 	test('should return Json', async () => {
-		const response = await worker.fetch('/json');
+		const response = await SELF.fetch('http://example.com/json');
 
 		if (response) {
 			expect(response.status).toBe(200);
