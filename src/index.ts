@@ -35,7 +35,22 @@ const triggerHandler = async (controller: ScheduledController, env: Env) => {
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		return new Response('Hello World!');
+		const path = new URL(request.url);
+		console.info({ path });
+
+		if (path.pathname === '/') {
+			return new Response('Hello World!');
+		}
+
+		if (path.pathname === '/404') {
+			return new Response('Not Found', { status: 404 });
+		}
+
+		if (path.pathname === '/json') {
+			return Response.json({ key: 'value' });
+		}
+
+		return new Response();
 	},
 	async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
 		ctx.waitUntil(triggerHandler(controller, env));
