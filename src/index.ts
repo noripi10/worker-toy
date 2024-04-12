@@ -9,6 +9,8 @@
  */
 
 export interface Env {
+	MY_VARIABLE: string;
+
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 	// MY_KV_NAMESPACE: KVNamespace;
 	//
@@ -39,7 +41,21 @@ export default {
 		console.info({ path });
 
 		if (path.pathname === '/') {
-			return new Response('Hello World!');
+			return new Response(
+				`
+<html>
+  <body>
+    <h1>Hello World!</h1>
+    <p>MY_VARIABLE: ${env.MY_VARIABLE}</p>
+  </body>
+</html>
+      `,
+				{
+					headers: {
+						'content-type': 'text/html',
+					},
+				}
+			);
 		}
 
 		if (path.pathname === '/404') {

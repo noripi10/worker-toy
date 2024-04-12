@@ -9,7 +9,7 @@ describe('Worker', () => {
 		if (response) {
 			expect(response.status).toBe(200);
 			const text = await response.text();
-			expect(text).toMatchInlineSnapshot(`"Hello World!"`);
+			expect(text).toContain(`Hello World!`);
 		}
 	});
 
