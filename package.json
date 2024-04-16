@@ -3,10 +3,11 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"deploy": "wrangler deploy --env production",
-		"dev": "wrangler dev --env dev",
+		"dev": "wrangler dev",
 		"dev:cron": "wrangler dev --test-scheduled",
 		"start": "wrangler dev --env staging",
+		"deploy": "wrangler deploy",
+		"deploy:prod": "wrangler deploy --env production",
 		"test": "vitest"
 	},
 	"devDependencies": {
