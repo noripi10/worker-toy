@@ -30,6 +30,13 @@ binding = "MY_PICTURES_BUCKET"
 bucket_name = "pictures"
 preview_bucket_name  = "pictures"
 
+# Bind an D1
+# Docs: https://developers.cloudflare.com/d1/
+[[d1_databases]]
+binding = "MY_WORKER_TOY_DB" # i.e. available in your Worker on env.DB
+database_name = "d1-worker-toy"
+database_id = "4952de3f-41b0-4c40-a4c5-52876a5139c3"
+
 # Bind a Queue producer. Use this binding to schedule an arbitrary task that may be processed later by a Queue consumer.
 # Docs: https://developers.cloudflare.com/queues/get-started
 # [[queues.producers]]
