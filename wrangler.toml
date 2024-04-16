@@ -22,6 +22,9 @@ MY_VARIABLE = "production_value"
 [[kv_namespaces]]
 binding = "MY_WORKER_TOY"
 id = "bee798b9e6d041a3b0f32918809d4a48"
+[[env.production.kv_namespaces]]
+binding = "MY_WORKER_TOY"
+id = "bee798b9e6d041a3b0f32918809d4a48"
 
 # Bind an R2 Bucket. Use R2 to store arbitrarily large blobs of data, such as files.
 # Docs: https://developers.cloudflare.com/r2/api/workers/workers-api-usage/
@@ -29,10 +32,18 @@ id = "bee798b9e6d041a3b0f32918809d4a48"
 binding = "MY_PICTURES_BUCKET"
 bucket_name = "pictures"
 preview_bucket_name  = "pictures"
+[[env.production.r2_buckets]]
+binding = "MY_PICTURES_BUCKET"
+bucket_name = "pictures"
+preview_bucket_name  = "pictures"
 
 # Bind an D1
 # Docs: https://developers.cloudflare.com/d1/
 [[d1_databases]]
+binding = "MY_WORKER_TOY_DB" # i.e. available in your Worker on env.DB
+database_name = "d1-worker-toy"
+database_id = "4952de3f-41b0-4c40-a4c5-52876a5139c3"
+[[env.production.d1_databases]]
 binding = "MY_WORKER_TOY_DB" # i.e. available in your Worker on env.DB
 database_name = "d1-worker-toy"
 database_id = "4952de3f-41b0-4c40-a4c5-52876a5139c3"
