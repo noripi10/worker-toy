@@ -19,3 +19,7 @@
 ```sh
   pnpm wrangler d1 execute d1-worker-toy --remote --command="SELECT * FROM Customers"
 ```
+
+## Vitest
+
+[@cloudflare/vitest-pool-workers 使用](https://developers.cloudflare.com/workers/testing/vitest-integration/get-started/migrate-from-unstable-dev/)

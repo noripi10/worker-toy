@@ -117,13 +117,29 @@ export default {
 
 			switch (request.method) {
 				case 'GET':
+					// [Cache設定]
+					// https://developers.cloudflare.com/workers/examples/cache-api/
+					// @ts-ignore requestの型が合わない??
+					const cacheKey = new Request(url.toString(), request);
+					const cache = caches.default;
+					let response = await cache.match(cacheKey);
+					if (response) {
+						console.log(`Cache hit for: ${request.url}.`);
+						return response;
+					}
+					console.log(`Response for request url: ${request.url} not present in cache. Fetching and caching request.`);
+
 					const object = await env.MY_PICTURES_BUCKET.get(key ?? '');
 					if (object) {
 						const headers = new Headers();
 						object.writeHttpMetadata(headers);
 						headers.set('etag', object.httpEtag);
+						headers.set('Cache-Control', 'public, max-age=3600');
 
-						return new Response(object.body, { headers });
+						response = new Response(object.body, { headers });
+
+						ctx.waitUntil(cache.put(cacheKey, response.clone()));
+						return response;
 					}
 					break;
 
