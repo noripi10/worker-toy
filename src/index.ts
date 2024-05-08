@@ -73,21 +73,24 @@ export default {
 		if (url.pathname.startsWith('/kv-list')) {
 			const result = await env.MY_WORKER_TOY.list();
 			const list = result;
-			return Response.json({ list });
+			const response = Response.json({ list });
+			return response;
 		}
 		if (url.pathname.startsWith('/kv')) {
 			// KeyはQueryから取得
 			const key = url.pathname.split('/').slice(2).join('/');
 			switch (request.method) {
 				case 'GET':
-					const getResult = await env.MY_WORKER_TOY.get(key);
+					// 第二引数で kv typeを指定可能
+					const getResult = await env.MY_WORKER_TOY.get(key, { type: 'text' });
 					return new Response(`KV Value ${key}:${getResult ?? 'null'}}`, { status: 200 });
 
 				case 'POST':
 					const fd = await request.formData();
 					const value = fd.get('value') as string;
 					if (key && value) {
-						await env.MY_WORKER_TOY.put(key, value);
+						// kv の有効期限を設定可能
+						await env.MY_WORKER_TOY.put(key, value, { expirationTtl: 60 });
 						return new Response(`KV Upload Success! ${key}:${value}}`, { status: 200 });
 					}
 					break;
