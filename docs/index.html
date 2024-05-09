@@ -6,6 +6,7 @@
 		<title>worker-toy</title>
 		<link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css" />
 		<link rel="stylesheet" href="https://unpkg.com/@exampledev/new.css@1.1.2/new.css" />
+		<link rel="stylesheet" href="https://newcss.net/theme/night.css" />
 		<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 		<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 		<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
@@ -13,17 +14,91 @@
 	<body>
 		<div id="root"></div>
 		<script type="text/babel">
+			const { useState, useEffect } = React;
+			const baseUrl = 'https://worker-toy.noripi10.workers.dev';
+
 			const App = () => {
-				const { useState, useEffect } = React;
-				const baseUrl = 'https://worker-toy.noripi10.workers.dev';
+				const [kvKey, setKvKey] = useState('');
+				const [kvValue, setKvValue] = useState('');
+
+				const [r2File, setR2File] = useState();
+				const [r2Key, setR2Key] = useState('');
 
 				const [result, setResult] = useState('');
 
 				const handleRequest = async (request) => {
-					if (request === 'kv-list') {
-						const response = await fetch(`${baseUrl}/kv-list`);
-						const list = await response.json();
-						setResult(JSON.stringify(list));
+					let response;
+					switch (request) {
+						case 'json':
+							response = await fetch(`${baseUrl}/json`);
+							const json = await response.json();
+							setResult(JSON.stringify(json, null, 2));
+							break;
+
+						case 'kv-list':
+							response = await fetch(`${baseUrl}/kv-list`);
+							const kvList = await response.json();
+							setResult(JSON.stringify(kvList, null, 2));
+							break;
+
+						case 'kv-get':
+							response = await fetch(`${baseUrl}/kv/${kvKey}`);
+							const kvGet = await response.text();
+							setResult(kvGet);
+							break;
+
+						case 'kv-post':
+							const fd = new FormData();
+							fd.append('value', kvValue);
+							response = await fetch(`${baseUrl}/kv/${kvKey}`, { method: 'POST', body: fd });
+							const kvPost = await response.text();
+							setResult(kvPost);
+							break;
+
+						case 'kv-delete':
+							response = await fetch(`${baseUrl}/kv/${kvKey}`, { method: 'DELETE' });
+							const kvDelete = await response.text();
+							setResult(kvDelete);
+							break;
+
+						case 'r2-list':
+							response = await fetch(`${baseUrl}/r2-list`);
+							const r2List = await response.json();
+							setResult(JSON.stringify(r2List, null, 2));
+							break;
+
+						case 'r2-get':
+							response = await fetch(`${baseUrl}/r2/${r2Key}`);
+							const blob = await response.blob();
+							const url = URL.createObjectURL(blob);
+							setResult(url);
+							break;
+
+						case 'r2-put':
+							response = await fetch(`${baseUrl}/r2/${r2Key}`, { method: 'PUT', body: r2File });
+							const r2Put = await response.text();
+							setResult(r2Put);
+							break;
+
+						case 'r2-post':
+							const r2fd = new FormData();
+							r2fd.append(r2Key, r2File, r2Key);
+							response = await fetch(`${baseUrl}/r2/${r2Key}`, { method: 'POST', body: r2fd });
+							const r2Post = await response.text();
+							setResult(r2Post);
+							break;
+
+						case 'r2-delete':
+							response = await fetch(`${baseUrl}/r2/${r2Key}`, { method: 'DELETE' });
+							const r2Delete = await response.text();
+							setResult(kvDelete);
+							break;
+
+						case 'd1-get':
+							response = await fetch(`${baseUrl}/d1`);
+							const d1List = await response.json();
+							setResult(JSON.stringify(d1List, null, 2));
+							break;
 					}
 				};
 
@@ -32,12 +107,67 @@
 						<h1>WORKER TOY</h1>
 
 						<div>
-							<button onClick={() => handleRequest('kv-list')}>Request - kv-list</button>
+							<button onClick={() => handleRequest('json')}>json</button>
 						</div>
 
+						<wbr />
+
 						<div>
-							<div>RESULT:</div>
-							<div>{result}</div>
+							<button onClick={() => handleRequest('kv-list')}>KV list</button>
+							<button onClick={() => handleRequest('kv-get')}>KV (get)</button>
+							<button onClick={() => handleRequest('kv-post')}>KV (post)</button>
+							<button onClick={() => handleRequest('kv-delete')}>KV (delete)</button>
+
+							<div>
+								<input placeHolder="KV key" onChange={(e) => setKvKey(e.target.value)} />
+								<input placeHolder="KV value" onChange={(e) => setKvValue(e.target.value)} />
+							</div>
+							<div>
+								<code>kv key: {kvKey}</code>
+							</div>
+						</div>
+
+						<wbr />
+
+						<div>
+							<button onClick={() => handleRequest('r2-list')}>R2 list</button>
+							<button onClick={() => handleRequest('r2-get')}>R2 (get)</button>
+							<button onClick={() => handleRequest('r2-put')}>R2 (put)</button>
+							<button onClick={() => handleRequest('r2-post')}>R2 (post)</button>
+							<button onClick={() => handleRequest('r2-delete')}>R2 (delete)</button>
+
+							<div>
+								<input placeHolder="R2 key" onChange={(e) => setR2Key(e.target.value)} />
+
+								<input
+									type="file"
+									accept="image/png, image/gif, image/jpeg"
+									onChange={(e) => {
+										const files = e.targe.files;
+										if (files && files.length) {
+											setR2File(files[0]);
+										} else {
+											setR2File();
+										}
+									}}
+								/>
+							</div>
+							<div>
+								<code>r2 key: {r2Key}</code>
+							</div>
+						</div>
+
+						<wbr />
+
+						<div>
+							<button onClick={() => handleRequest('d1-get')}>D1 (get)</button>
+						</div>
+
+						<wbr />
+
+						<div>
+							<h3>RESULT:</h3>
+							<pre>{result}</pre>
 						</div>
 					</main>
 				);

@@ -36,12 +36,37 @@ export interface Env {
 // 	event.respondWith(new Response('hello world!!!'));
 // });
 
+const corsWhiteList = ['http://127.0.0.1:5500', 'https://noripi10.github.io'];
+const corsHeaders = {
+	// 'Access-Control-Allow-Origin': '*'
+	// 'Access-Control-Allow-Credentials': 'true',
+	'Access-Control-Allow-Methods': 'GET,HEAD,POST,PUT,DELETE,OPTIONS',
+	'Access-Control-Allow-Headers': 'Content-Type, Accept, Authorization',
+	'Access-Control-Max-Age': '86400',
+};
+
 const triggerHandler = async (controller: ScheduledController, env: Env) => {
 	console.info(controller.cron, controller.scheduledTime, env);
 };
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+		const addCorsHeaders = (response: Response) => {
+			const origin = request.headers.get('Origin');
+			if (origin && corsWhiteList.some((c) => origin === c)) {
+				response.headers.set('Access-Control-Allow-Origin', origin);
+				Object.entries(corsHeaders).map(([name, value]) => {
+					response.headers.set(name, value);
+				});
+			}
+
+			return response;
+		};
+
+		if (request.method == 'OPTIONS') {
+			return addCorsHeaders(new Response(''));
+		}
+
 		const url = new URL(request.url);
 		console.info({ url: url.pathname });
 
@@ -66,7 +91,7 @@ export default {
 
 		// ## JSON
 		if (url.pathname === '/json') {
-			return Response.json({ key: 'value' });
+			return addCorsHeaders(Response.json({ key: 'value' }));
 		}
 
 		// ## KVNamesapce
@@ -74,8 +99,9 @@ export default {
 			const result = await env.MY_WORKER_TOY.list();
 			const list = result;
 			const response = Response.json({ list });
-			return response;
+			return addCorsHeaders(response);
 		}
+
 		if (url.pathname.startsWith('/kv')) {
 			// KeyはQueryから取得
 			const key = url.pathname.split('/').slice(2).join('/');
@@ -83,7 +109,7 @@ export default {
 				case 'GET':
 					// 第二引数で kv typeを指定可能
 					const getResult = await env.MY_WORKER_TOY.get(key, { type: 'text' });
-					return new Response(`KV Value ${key}:${getResult ?? 'null'}}`, { status: 200 });
+					return addCorsHeaders(new Response(`KV Value ${key}:${getResult ?? 'null'}`, { status: 200 }));
 
 				case 'POST':
 					const fd = await request.formData();
@@ -91,14 +117,14 @@ export default {
 					if (key && value) {
 						// kv の有効期限を設定可能
 						await env.MY_WORKER_TOY.put(key, value, { expirationTtl: 60 });
-						return new Response(`KV Upload Success! ${key}:${value}}`, { status: 200 });
+						return addCorsHeaders(new Response(`KV Upload Success! ${key}:${value}`, { status: 200 }));
 					}
 					break;
 
 				case 'DELETE':
 					if (key) {
 						await env.MY_WORKER_TOY.delete(key);
-						return new Response(`KV Delete Success! ${key}`, { status: 200 });
+						return addCorsHeaders(new Response(`KV Delete Success! ${key}`, { status: 200 }));
 					}
 					break;
 
@@ -111,7 +137,7 @@ export default {
 		if (url.pathname.startsWith('/r2-list')) {
 			const result = await env.MY_PICTURES_BUCKET.list();
 			const list = result.objects.map((e) => ({ key: e.key, size: e.size }));
-			return Response.json({ list });
+			return addCorsHeaders(Response.json({ list }));
 		}
 		if (url.pathname.startsWith('/r2')) {
 			// KeyはQueryから取得
@@ -128,7 +154,7 @@ export default {
 					let response = await cache.match(cacheKey);
 					if (response) {
 						console.log(`Cache hit for: ${request.url}.`);
-						return response;
+						return addCorsHeaders(response);
 					}
 					console.log(`Response for request url: ${request.url} not present in cache. Fetching and caching request.`);
 
@@ -142,14 +168,14 @@ export default {
 						response = new Response(object.body, { headers });
 
 						ctx.waitUntil(cache.put(cacheKey, response.clone()));
-						return response;
+						return addCorsHeaders(response);
 					}
 					break;
 
 				case 'PUT':
 					if (request.body) {
 						const result = await env.MY_PICTURES_BUCKET.put(key, request.body as ReadableStream<any>);
-						return new Response(`Upload Success! ${result?.key} ${result?.size}}`, { status: 200 });
+						return addCorsHeaders(new Response(`Upload Success! ${result?.key} ${result?.size}}`, { status: 200 }));
 					}
 					break;
 
@@ -173,13 +199,13 @@ export default {
 						);
 						const result = await env.MY_PICTURES_BUCKET.list();
 						const list = result.objects.map((e) => ({ key: e.key, size: e.size }));
-						return Response.json({ result: true, message: 'Upload Success!', list }, { status: 200 });
+						return addCorsHeaders(Response.json({ result: true, message: 'Upload Success!', list }, { status: 200 }));
 					}
 					break;
 
 				case 'DELETE':
 					await env.MY_PICTURES_BUCKET.delete(key);
-					return new Response('Delete Success!', { status: 200 });
+					return addCorsHeaders(new Response('Delete Success!', { status: 200 }));
 
 				default:
 					break;
@@ -191,13 +217,13 @@ export default {
 			switch (request.method) {
 				case 'GET':
 					const { results } = await env.MY_WORKER_TOY_DB.prepare('SELECT * FROM Customers').all<Customer>();
-					return Response.json({ list: results });
+					return addCorsHeaders(Response.json({ list: results }));
 
 				default:
 			}
 		}
 
-		return new Response('Not Found', { status: 404 });
+		return addCorsHeaders(new Response('Not Found', { status: 404 }));
 	},
 	async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
 		ctx.waitUntil(triggerHandler(controller, env));
