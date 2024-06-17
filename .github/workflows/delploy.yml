@@ -42,5 +42,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          packageManager: pnpm
           command: ${{ inputs.production_deploy && 'deploy --env production' || 'deploy' }}
