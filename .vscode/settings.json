@@ -1,3 +1,10 @@
 {
-	"biome.enabled": false
+	"biome.enabled": false,
+	"yaml.schemas": {
+		"https://www.graphql-code-generator.com/config.schema.json": ["codegen.yml"],
+		"https://json.schemastore.org/github-workflow.json": [
+			"file:///Users/sugiyamahironori/cloudflare/workers/worker-toy/.%20github/workflows/push.yml",
+			"file:///Users/sugiyamahironori/cloudflare/workers/worker-toy/.%20github/workflows/delploy.yml"
+		]
+	}
 }
