@@ -12,6 +12,7 @@ import { Customer } from './types/customer';
 
 export interface Env {
 	MY_VARIABLE: string;
+	MY_VARIABLE2: string;
 
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 	MY_WORKER_TOY: KVNamespace;
@@ -78,6 +79,7 @@ export default {
   <body>
     <h1>Hello World!</h1>
     <p>MY_VARIABLE: ${env.MY_VARIABLE}</p>
+    <p>MY_VARIABLE2: ${env.MY_VARIABLE2}</p>
   </body>
 </html>
       `,
