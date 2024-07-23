@@ -202,3 +202,23 @@ Flags:
 // SELF を使用する
 import { SELF } from 'cloudflare:test';
 ```
+
+- D1 テスト
+
+[Document](https://developers.cloudflare.com/workers/testing/vitest-integration/get-started/write-your-first-test)
+
+[Examples](https://github.com/cloudflare/workers-sdk/tree/main/fixtures/vitest-pool-workers-examples)
+
+vitest@1.5.0 を指定
+
+- マイグレーションファイルを作成
+
+```sh
+pnpm wrangler d1 migrations create MY_WORKER_TOY_DB init
+```
+
+- vitest.config.ts で migrations を環境変数にバインド (miniflare を使う)
+- test/env.d.ts で ProvidedEnv の型情報に Env を拡張する
+- test/tsconfig.json を作成し types を設定
+- beforeEach 処理内で applyD1Migrations でテスト用にマイグレーションを実行。またはセットアップファイル(vite.config.ts で指定)内で実行する
+- テスト実行

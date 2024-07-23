@@ -36,7 +36,6 @@
 		"types": [
 			"@cloudflare/workers-types",
 			"@cloudflare/workers-types/experimental",
-			"@cloudflare/vitest-pool-workers",
 			"vitest/globals"
 		] /* Specify type package names to be included without being referenced in a source file. */,
 		// "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
