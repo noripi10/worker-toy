@@ -201,7 +201,7 @@ Flags:
 
 ```sh
 # 初回
-npx wrangler d1 migrations create d1- create_customers_table
+npx wrangler d1 migrations create d1-worker-toy create_customers_table
 
 # shema.prisma にモデルを記述したら以下を実行すると0001_create_customers_table.sqlに反映される
 npx prisma migrate diff --from-empty --to-schema-datamodel ./prisma/schema.prisma --script > migrations/0001_create_customers_table.sql
