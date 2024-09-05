@@ -11,18 +11,18 @@ describe('Databese Query (D1)', () => {
 		await env.MY_WORKER_TOY_DB.prepare(
 			`
       INSERT INTO
-      Customers (CustomerID, CompanyName, ContactName)
+      Customers (CustomerID, CompanyName, ContactName, CreatedAt, UpdatedAt)
       VALUES
-      (1, 'Alfreds Futterkiste', 'Maria Anders'),
-      (4, 'Around the Horn', 'Thomas Hardy'),
-      (11, 'Bs Beverages', 'Victoria Ashworth'),
-      (13, 'Bs Beverages', 'Random Name');
+      (1, 'Alfreds Futterkiste', 'Maria Anders', datetime('now'), datetime('now')),
+      (4, 'Around the Horn', 'Thomas Hardy', datetime('now'), datetime('now')),
+      (11, 'Bs Beverages', 'Victoria Ashworth', datetime('now'), datetime('now')),
+      (13, 'Bs Beverages', 'Random Name', datetime('now'), datetime('now'));
     `
 		).run();
 
 		await env.MY_WORKER_TOY_DB.prepare(
 			`
-		    INSERT INTO Customers VALUES (?1, ?2, ?3)
+		    INSERT INTO Customers VALUES (?1, ?2, ?3, datetime('now'), datetime('now'))
 		  `
 		)
 			.bind(100, 'hoge', 'fuga')

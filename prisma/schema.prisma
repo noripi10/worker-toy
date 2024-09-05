@@ -1,0 +1,20 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Customers {
+  CustomerId  Int      @id @default(autoincrement())
+  CompanyName String
+  ContactName String
+  CreatedAt   DateTime @default(now())
+  UpdatedAt   DateTime @default(now())
+}

@@ -8,6 +8,7 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { createClient } from './libs/prisma';
 import { Customer } from './types/customer';
 
 // addEventListener('fetch', (event) => {
@@ -198,6 +199,17 @@ export default {
 					const { results } = await env.MY_WORKER_TOY_DB.prepare('SELECT * FROM Customers').all<Customer>();
 					return addCorsHeaders(Response.json({ list: results }));
 
+				default:
+			}
+		}
+
+		if (url.pathname === '/d1-prisma') {
+			switch (request.method) {
+				case 'GET':
+					const prismaClient = createClient(env);
+					const customers = await prismaClient.customers.findMany();
+
+					return addCorsHeaders(Response.json({ customers }));
 				default:
 			}
 		}

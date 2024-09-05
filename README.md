@@ -122,7 +122,7 @@ Flags:
   preview_bucket_name  = "pictures"
 ```
 
-## D1
+## D1 (DB 作成)
 
 [Document](https://developers.cloudflare.com/d1/get-started/)
 
@@ -183,6 +183,45 @@ Flags:
   database_id = "4952de3f-41b0-4c40-a4c5-52876a5139c3"
 ```
 
+### D1 + Prisma
+
+[Query D1 using Prisma ORM](https://developers.cloudflare.com/d1/tutorials/d1-and-prisma-orm/)
+
+1. DB 作成 ↑
+2. Prisma 設定
+3. D1 マイグレーション内容記述
+
+   - wrangler コマンドでマイグレーションファイルを作成
+   - schema.prisma に model 内容を記述
+   - schema.prisma ファイルの変更内容を prisma コマンドで wrangler マイグレーションファイルに反映
+
+4. D1 マイグレーション適用
+
+#### マイグレーションのやり方
+
+```sh
+# 初回
+npx wrangler d1 migrations create d1- create_customers_table
+
+# shema.prisma にモデルを記述したら以下を実行すると0001_create_customers_table.sqlに反映される
+npx prisma migrate diff --from-empty --to-schema-datamodel ./prisma/schema.prisma --script > migrations/0001_create_customers_table.sql
+
+# マイグレーション内容をDBに反映させる
+npx wrangler d1 migrations apply d1-worker-toy --local
+npx wrangler d1 migrations apply d1-worker-toy --remote
+
+# prisma clientを作成
+npx prisma generate
+
+
+# テーブル構造を変更したりテーブル作成したいばあいは schema.prismaを編集し以下を実行
+npx wrangler d1 migrations create d1-worker-toy add_columns_customers
+npx prisma migrate diff --from-local-d1 --to-schema-datamodel ./prisma/schema.prisma --script > migrations/0002_add_columns_customers.sql
+npx wrangler d1 migrations apply d1-worker-toy --local
+npx wrangler d1 migrations apply d1-worker-toy --remote
+npx prisma generate
+```
+
 ## Vitest
 
 [@cloudflare/vitest-pool-workers 使用](https://developers.cloudflare.com/workers/testing/vitest-integration/get-started/migrate-from-unstable-dev/)
@@ -214,7 +253,7 @@ vitest@1.5.0 を指定
 - マイグレーションファイルを作成
 
 ```sh
-pnpm wrangler d1 migrations create MY_WORKER_TOY_DB init
+pnpm wrangler d1 migrations create d1-worker-toy init
 ```
 
 - vitest.config.ts で migrations を環境変数にバインド (miniflare を使う)
