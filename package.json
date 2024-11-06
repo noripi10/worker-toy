@@ -3,6 +3,7 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
+    "types": "wrangler types",
 		"dev": "wrangler dev",
 		"dev:remote": "wrangler dev --remote",
 		"dev:cron": "wrangler dev --test-scheduled",

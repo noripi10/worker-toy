@@ -4,7 +4,7 @@ compatibility_date = "2024-04-03"
 compatibility_flags= ["nodejs_compat"]
 
 [triggers]
-crons = ["*/5 * * * *"]
+crons = ["0 * * * *"]
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
@@ -19,7 +19,7 @@ MY_VARIABLE = "production_value"
 [[kv_namespaces]]
 binding = "MY_WORKER_TOY"
 id = "bee798b9e6d041a3b0f32918809d4a48"
-preview_id = "bee798b9e6d041a3b0f32918809d4a48"
+preview_id = "630ca446ed41426fa836af2b3ec2612c"
 [[env.production.kv_namespaces]]
 binding = "MY_WORKER_TOY"
 id = "bee798b9e6d041a3b0f32918809d4a48"
